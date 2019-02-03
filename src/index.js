@@ -10,36 +10,29 @@ function Square(props) {
     );
 }
 
-class Board extends React.Component {
-    // Méthodes
-    renderSquare(i) {
-        return (
-            <Square value={this.props.squares[i]}
-                    onClick={() => this.props.onClick(i)} />
-        );
-    }
+function Board(props) {
+    let rows = [];
 
-    render() {
-        let rows = [];
+    for (let row = 0; row < 3; ++row) {
+        let squares = [];
 
-        for (let row = 0; row < 3; ++row) {
-            let squares = [];
+        for (let col = 0; col < 3; ++col) {
+            const i = row * 3 + col;
 
-            for (let col = 0; col < 3; ++col) {
-                squares.push(
-                    this.renderSquare(row * 3 + col)
-                )
-            }
-
-            rows.push(
-                <div className="board-row">{ squares }</div>
+            squares.push(
+                <Square key={i} value={props.squares[i]}
+                        onClick={() => props.onClick(i)} />
             )
         }
 
-        return (
-            <div>{ rows }</div>
-        );
+        rows.push(
+            <div key={row} className="board-row">{ squares }</div>
+        )
     }
+
+    return (
+        <div>{ rows }</div>
+    );
 }
 
 class Game extends React.Component {
