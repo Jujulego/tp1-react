@@ -4,7 +4,7 @@ import './index.css';
 
 function Square(props) {
     return (
-        <button className="square" onClick={props.onClick}>
+        <button className={"square" + (props.highlight ? " highlight" : "")} onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -20,7 +20,7 @@ function Board(props) {
             const i = row * 3 + col;
 
             squares.push(
-                <Square key={i} value={props.squares[i]}
+                <Square key={i} value={props.squares[i]} highlight={ props.highlights[i] }
                         onClick={() => props.onClick(i)} />
             )
         }
@@ -44,6 +44,7 @@ class Game extends React.Component {
             history: [{
                 squares: Array(9).fill(null),
             }],
+            hightlights: Array(9).fill(false),
             stepNumber: 0,
             xIsNext: true,
             reverseMoves: false,
@@ -65,6 +66,7 @@ class Game extends React.Component {
             history: history.concat({
                 squares: squares,
             }),
+
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
         });
@@ -135,7 +137,8 @@ class Game extends React.Component {
         return (
             <div className="game">
                 <div className="game-board">
-                    <Board squares={current.squares} onClick={(i) => this.handleClick(i)} />
+                    <Board squares={current.squares} highlights={ highlightsSquares(current.squares) }
+                           onClick={(i) => this.handleClick(i)} />
                 </div>
                 <div className="game-info">
                     <div>{ status }</div>
@@ -154,7 +157,7 @@ ReactDOM.render(
 );
 
 function calculateWinner(squares) {
-    const lines = [
+    const LINES = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -164,11 +167,39 @@ function calculateWinner(squares) {
         [0, 4, 8],
         [2, 4, 6],
     ];
-    for (let i = 0; i < lines.length; i++) {
-        const [a, b, c] = lines[i];
+
+    for (let i = 0; i < LINES.length; i++) {
+        const [a, b, c] = LINES[i];
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
             return squares[a];
         }
     }
+
     return null;
+}
+
+function highlightsSquares(squares) {
+    const LINES = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+
+    let highlights = Array(9).fill(false);
+    for (let i = 0; i < LINES.length; i++) {
+        const [a, b, c] = LINES[i];
+
+        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            highlights[a] = true;
+            highlights[b] = true;
+            highlights[c] = true;
+        }
+    }
+
+    return highlights;
 }
